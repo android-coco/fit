@@ -19,8 +19,8 @@ type ControllerInterface interface {
 
 // rendering Json data (© jp)
 type ConterllerRenderingJson interface {
-	renderingJsonAutomatically(result int, errMsg string)
-	renderingJson(result int, errMsg string, datas []interface{})
+	RenderingJsonAutomatically(result int, errMsg string)
+	RenderingJson(result int, errMsg string, datas interface{})
 }
 
 //json result struct
@@ -75,6 +75,10 @@ func (c *Controller) Patch(w *Response, r *Request, p Params) {
 func (c *Controller) Options(w *Response, r *Request, p Params) {
 	http.Error(w.Writer(), "Method Not Allowed", 405)
 }
+// 重定向
+func (c *Controller)Redirect(w *Response, r *Request,url string, code int){
+	http.Redirect(w.writer,r.Request,url,code)
+}
 
 func (c *Controller) LoadView(w *Response, tplname string) {
 	var err error
@@ -86,6 +90,9 @@ func (c *Controller) LoadView(w *Response, tplname string) {
 }
 // json 输出函数
 func (c *Controller)ResponseToJson(w *Response)  {
+	if c.JsonData.Datas == nil{
+		c.JsonData.Datas = []interface{}{}
+	}
 	b, err := json.Marshal(c.JsonData)
 	if err != nil {
 		fmt.Fprint(w.Writer(), err.Error())
