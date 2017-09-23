@@ -73,7 +73,8 @@ func SQLServerEngine() *xorm.Engine  {
 func OracleEngine() *xorm.Engine  {
 	if msEngine == nil {
 		var err error
-		msEngine, err = xorm.NewEngine("oci8", "song/123456@192.168.0.105:1521/ORCL")
+		msEngine, err = xorm.NewEngine(Config().OracleDriverName, Config().OracleConnUrl)
+		//"song/123456@192.168.0.105:1521/ORCL"
 		Logger().LogError("new orcale engine failed:", msEngine,err)
 		//SnakeMapper 支持struct为驼峰式命名，表结构为下划线命名之间的转换，这个是默认的Maper
 		//映射同名设置默认

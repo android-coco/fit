@@ -43,13 +43,15 @@ type config struct {
 	Password   string
 	DataBase   string
 
-
 	MSDriverName string
-	MSServer   string
+	MSServer     string
 	MSDBPort     string
-	MSUserId   string
+	MSUserId     string
 	MSPassword   string
 	MSDataBase   string
+
+	OracleDriverName string
+	OracleConnUrl    string
 }
 
 func (conf *config) LoadConfig(fname string) (bool, error) {
@@ -162,11 +164,14 @@ func Config() *config {
 			DataBase:   "test",
 
 			MSDriverName: "mysql",
-			MSServer:   "127.0.0.1",
+			MSServer:     "127.0.0.1",
 			MSDBPort:     "3306",
-			MSUserId:   "root",
+			MSUserId:     "root",
 			MSPassword:   "123456",
 			MSDataBase:   "test",
+
+			OracleDriverName: "oci8",
+			OracleConnUrl:    "sys/123456@127.0.0.1:1521/ORCL",
 		}
 	}
 

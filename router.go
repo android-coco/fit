@@ -2,13 +2,31 @@ package fit
 
 import (
 	"net/http"
-	//"fmt"
 	"reflect"
 	"strings"
 )
 
 var (
 	g_Router *router = nil
+	// HTTPMETHOD list the supported http methods.
+	HTTPMETHOD = map[string]string{
+		"GET":       "GET",
+		"POST":      "POST",
+		"PUT":       "PUT",
+		"DELETE":    "DELETE",
+		"PATCH":     "PATCH",
+		"OPTIONS":   "OPTIONS",
+		"HEAD":      "HEAD",
+		"TRACE":     "TRACE",
+		"CONNECT":   "CONNECT",
+		"MKCOL":     "MKCOL",
+		"COPY":      "COPY",
+		"MOVE":      "MOVE",
+		"PROPFIND":  "PROPFIND",
+		"PROPPATCH": "PROPPATCH",
+		"LOCK":      "LOCK",
+		"UNLOCK":    "UNLOCK",
+	}
 )
 
 // Handle is a function that can be registered to a route to handle HTTP
@@ -102,7 +120,7 @@ type router struct {
 	PanicHandler func(http.ResponseWriter, *http.Request, interface{})
 }
 
-func (r *router) AddRouter(path string, controlInstance ControllerInterface) {
+func (r *router) AddRouter(path string, controlInstance ControllerInterface, mappingMethods ...string) {
 	reflectVal := reflect.ValueOf(controlInstance)
 	t := reflect.Indirect(reflectVal).Type()
 	for i := 0; i < t.NumMethod(); i++ {
@@ -123,8 +141,44 @@ func (r *router) AddRouter(path string, controlInstance ControllerInterface) {
 			r.RegisterHandler("DELETE", path, controlInstance.Patch)
 		}
 	}
-}
 
+
+	//methods := make(map[string]string)
+	//if len(mappingMethods) > 0 {
+	//	semi := strings.Split(mappingMethods[0], ";")
+	//	for _, v := range semi {
+	//		colon := strings.Split(v, ":")
+	//		if len(colon) != 2 {
+	//			panic("method mapping format is invalid")
+	//		}
+	//		comma := strings.Split(colon[0], ",")
+	//		for _, m := range comma {
+	//			if _, ok := HTTPMETHOD[strings.ToUpper(m)]; m == "*" || ok {
+	//				if val := reflectVal.MethodByName(colon[1]); val.IsValid() {
+	//					//methods[strings.ToUpper(m)] = colon[1]
+	//					//colon[1]
+	//					//fmt.Println(reflect.MakeFunc())
+	//					Logger().LogError("aaaaa",val.Call(nil))
+	//
+	//					//switch funcType := val.(type) {
+	//					//case HandlerFunc:
+	//					//
+	//					//default:
+	//					//	panic("'" + colon[1] + "' method doesn't HandlerFunc func(*Response, *Request, Params) type in the controller " + t.Name())
+	//					//}
+	//					//HandlerFunc
+	//					r.RegisterHandler(strings.ToUpper(m), path,HandlerFunc(&val))
+	//				} else {
+	//					panic("'" + colon[1] + "' method doesn't exist in the controller " + t.Name())
+	//				}
+	//			} else {
+	//				panic(v + " is an invalid method mapping. Method doesn't exist " + m)
+	//			}
+	//		}
+	//	}
+	//}
+
+}
 // Handle registers a new request handle with the given path and method.
 //
 // For GET, POST, PUT, PATCH and DELETE requests the respective shortcut
@@ -236,10 +290,10 @@ func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		defer r.recv(w, req)
 	}
 	path := req.URL.Path
-	Logger().LogInfo("Router:",path,req.Method)
+	Logger().LogInfo("Router:", path, req.Method)
 	if root := r.trees[req.Method]; root != nil {
 		//静态文件加载
-		if strings.HasPrefix(path,"/static/"){
+		if strings.HasPrefix(path, "/static/") {
 			had := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
 			had.ServeHTTP(w, req)
 			return
