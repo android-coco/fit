@@ -163,9 +163,9 @@ func Config() *config {
 			Password:   "123456",
 			DataBase:   "test",
 
-			MSDriverName: "mysql",
+			MSDriverName: "mssql",
 			MSServer:     "127.0.0.1",
-			MSDBPort:     "3306",
+			MSDBPort:     "1433",
 			MSUserId:     "root",
 			MSPassword:   "123456",
 			MSDataBase:   "test",

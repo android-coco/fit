@@ -123,62 +123,60 @@ type router struct {
 func (r *router) AddRouter(path string, controlInstance ControllerInterface, mappingMethods ...string) {
 	reflectVal := reflect.ValueOf(controlInstance)
 	t := reflect.Indirect(reflectVal).Type()
-	for i := 0; i < t.NumMethod(); i++ {
-		m := t.Method(i)
-		if strings.ToUpper(m.Name) == "GET" {
-			r.RegisterHandler("GET", path, controlInstance.Get)
-		} else if strings.ToUpper(m.Name) == "POST" {
-			r.RegisterHandler("POST", path, controlInstance.Post)
-		} else if strings.ToUpper(m.Name) == "DELETE" {
-			r.RegisterHandler("DELETE", path, controlInstance.Delete)
-		} else if strings.ToUpper(m.Name) == "HEAD" {
-			r.RegisterHandler("HEAD", path, controlInstance.Head)
-		} else if strings.ToUpper(m.Name) == "OPTIONS" {
-			r.RegisterHandler("OPTIONS", path, controlInstance.Options)
-		} else if strings.ToUpper(m.Name) == "PUT" {
-			r.RegisterHandler("PUT", path, controlInstance.Put)
-		} else if strings.ToUpper(m.Name) == "PATCH" {
-			r.RegisterHandler("DELETE", path, controlInstance.Patch)
+
+	//methods := make(map[string]string)
+	//自定义路由====
+	if len(mappingMethods) > 0 {
+		semi := strings.Split(mappingMethods[0], ";")
+		for _, v := range semi {
+			colon := strings.Split(v, ":")
+			if len(colon) != 2 {
+				panic("method mapping format is invalid")
+			}
+			comma := strings.Split(colon[0], ",")
+			for _, m := range comma {
+				if _, ok := HTTPMETHOD[strings.ToUpper(m)]; m == "*" || ok {
+					if val := reflectVal.MethodByName(colon[1]); val.IsValid() {
+						//methods[strings.ToUpper(m)] = colon[1]
+						//如果不是HandlerFunc类型
+						//Logger().LogError("111:", val.Type())
+						if val.Type() != reflect.TypeOf(func(*Response, *Request, Params) {}) {
+							panic("'" + colon[1] + "' method is illegal in the controller " + t.Name())
+						}
+						//利用反射强转类型
+						action := val.Interface().(func(*Response, *Request, Params))
+						r.RegisterHandler(strings.ToUpper(m), path, action)
+					} else {
+						panic("'" + colon[1] + "' method doesn't exist in the controller " + t.Name())
+					}
+				} else {
+					panic(v + " is an invalid method mapping. Method doesn't exist " + m)
+				}
+			}
+		}
+	} else {
+		for i := 0; i < t.NumMethod(); i++ {
+			m := t.Method(i)
+			if strings.ToUpper(m.Name) == "GET" {
+				r.RegisterHandler("GET", path, controlInstance.Get)
+			} else if strings.ToUpper(m.Name) == "POST" {
+				r.RegisterHandler("POST", path, controlInstance.Post)
+			} else if strings.ToUpper(m.Name) == "DELETE" {
+				r.RegisterHandler("DELETE", path, controlInstance.Delete)
+			} else if strings.ToUpper(m.Name) == "HEAD" {
+				r.RegisterHandler("HEAD", path, controlInstance.Head)
+			} else if strings.ToUpper(m.Name) == "OPTIONS" {
+				r.RegisterHandler("OPTIONS", path, controlInstance.Options)
+			} else if strings.ToUpper(m.Name) == "PUT" {
+				r.RegisterHandler("PUT", path, controlInstance.Put)
+			} else if strings.ToUpper(m.Name) == "PATCH" {
+				r.RegisterHandler("DELETE", path, controlInstance.Patch)
+			}
 		}
 	}
 
-
-	//methods := make(map[string]string)
-	//if len(mappingMethods) > 0 {
-	//	semi := strings.Split(mappingMethods[0], ";")
-	//	for _, v := range semi {
-	//		colon := strings.Split(v, ":")
-	//		if len(colon) != 2 {
-	//			panic("method mapping format is invalid")
-	//		}
-	//		comma := strings.Split(colon[0], ",")
-	//		for _, m := range comma {
-	//			if _, ok := HTTPMETHOD[strings.ToUpper(m)]; m == "*" || ok {
-	//				if val := reflectVal.MethodByName(colon[1]); val.IsValid() {
-	//					//methods[strings.ToUpper(m)] = colon[1]
-	//					//colon[1]
-	//					//fmt.Println(reflect.MakeFunc())
-	//					Logger().LogError("aaaaa",val.Call(nil))
-	//
-	//					//switch funcType := val.(type) {
-	//					//case HandlerFunc:
-	//					//
-	//					//default:
-	//					//	panic("'" + colon[1] + "' method doesn't HandlerFunc func(*Response, *Request, Params) type in the controller " + t.Name())
-	//					//}
-	//					//HandlerFunc
-	//					r.RegisterHandler(strings.ToUpper(m), path,HandlerFunc(&val))
-	//				} else {
-	//					panic("'" + colon[1] + "' method doesn't exist in the controller " + t.Name())
-	//				}
-	//			} else {
-	//				panic(v + " is an invalid method mapping. Method doesn't exist " + m)
-	//			}
-	//		}
-	//	}
-	//}
-
 }
+
 // Handle registers a new request handle with the given path and method.
 //
 // For GET, POST, PUT, PATCH and DELETE requests the respective shortcut
