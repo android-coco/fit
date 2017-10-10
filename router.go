@@ -176,7 +176,6 @@ func (r *router) AddRouter(path string, controlInstance ControllerInterface, map
 	}
 
 }
-
 // Handle registers a new request handle with the given path and method.
 //
 // For GET, POST, PUT, PATCH and DELETE requests the respective shortcut
