@@ -7,6 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"github.com/tealeg/xlsx"
+	"errors"
+	"fmt"
+	"io/ioutil"
 )
 
 var alphaNum = []byte(`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz`)
@@ -56,4 +60,66 @@ func GetCurrentDirectory() string {
 		Logger().LogError("File Path:", err)
 	}
 	return strings.Replace(dir, "\\", "/", -1)
+}
+
+//key 标题,vlue数据
+func ExportExcel(r *Response, titles []string, data [][]string, filename string) error {
+	var file *xlsx.File
+	var sheet *xlsx.Sheet
+	var row *xlsx.Row
+	var cell *xlsx.Cell
+	var err error
+	file = xlsx.NewFile()
+	sheet, err = file.AddSheet("Sheet1")
+	if err != nil {
+		return err
+	}
+	if titles == nil || data == nil {
+		return errors.New("参数不能为空！")
+	}
+	if len(titles) != len(data[0]) {
+		return errors.New("数据格式错误！")
+	}
+	//加入标题
+	if titles != nil && len(titles) > 0 {
+		row = sheet.AddRow()
+		for _, k := range titles {
+			cell = row.AddCell()
+			cell.Value = k
+		}
+	}
+	//加入内容
+	if data != nil && len(data) > 0 {
+		for _, k := range data {
+			row = sheet.AddRow()
+			for _, k1 := range k {
+				cell = row.AddCell()
+				cell.Value = k1
+			}
+		}
+	}
+	err = file.Save(filename + ".xlsx") //生成临时文件
+	if err != nil {
+		return err
+	}
+	file1, err1 := os.Open("./" + filename + ".xlsx") //打开临时文件
+	defer os.Remove("./" + filename + ".xlsx")        //删除临时文件
+	defer file1.Close()                               //关闭文件
+	if err1 != nil {
+		return err1
+	}
+	b, _ := ioutil.ReadAll(file1)
+	r.Writer().Header().Set("Accept-Ranges", "bytes")
+	r.Writer().Header().Set("Cache-Control", "must-revalidate, post-check=0, pre-check=0")
+	r.Writer().Header().Set("Cache-Control", "max-age=0")
+	r.Writer().Header().Set("Cache-Control", "max-age=1")
+	r.Writer().Header().Set("Pragma", "no-cache")
+	r.Writer().Header().Set("Expires", "0")
+	r.Writer().Header().Set("Content-Disposition", "attachment;filename="+fmt.Sprintf("%s", filename+".xlsx")) //文件名称
+	r.Writer().Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	_, err = r.Writer().Write(b) //输出到浏览器
+	if err != nil {
+		return err
+	}
+	return nil
 }

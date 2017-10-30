@@ -10,7 +10,7 @@ const (
 )
 
 var (
-	g_App *appication = nil
+	g_App  *appication = nil
 	Modles []interface{}
 )
 
@@ -18,7 +18,7 @@ type appication struct {
 	Server *http.Server
 }
 
-func (app *appication)InitModels(models []interface{})  {
+func (app *appication) InitModels(models []interface{}) {
 	Modles = models
 }
 
@@ -59,10 +59,12 @@ func (app *appication) Start() (bool, error) {
 	//} else {
 	//	Logger().LogInfo("success to sync database。。。")
 	//}
+	SartOK = true //启动OK
 	err := app.Server.ListenAndServe()
 
 	if err != nil {
 		Logger().LogError(LOG_TAG, err.Error())
+		SartOK = false //启动失败
 		return false, err
 	}
 	return true, nil

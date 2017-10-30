@@ -80,14 +80,44 @@ func (c *Controller)Redirect(w *Response, r *Request,url string, code int){
 	http.Redirect(w.writer,r.Request,url,code)
 }
 
-func (c *Controller) LoadView(w *Response, tplname string) {
+func (c *Controller) LoadView(w *Response, tplname ...string) {
 	var err error
 	var t *template.Template
-	t, err = template.ParseFiles("view"+"/" + tplname)  //从文件创建一个模板
+	var args []string
+	for _, arg := range tplname {
+		arg = "view/" + arg
+		args = append(args, arg)
+	}
+	t, err = template.ParseFiles(args...)  //从文件创建一个模板
 	CheckError(err)
 	err = t.Execute(w.Writer(), c.Data)
 	CheckError(err)
 }
+
+/*Checking session and then load a special view */
+func (c *Controller) LoadViewSafely(w *Response, r *Request, tplname ...string) (success bool) {
+	session, err_s := GlobalManager().SessionStart(w, r)
+	if err_s != nil || session == nil {
+		// Session失效 重新登录
+		Logger().LogError("JP ", "Session失效 重新登录" + err_s.Error())
+		return false
+	} else {
+		userinfo := session.Get("UserInfo")
+		if userinfo == nil {
+			// 未登录
+			Logger().LogDebug("JP ", "未登录")
+			return false
+		} else {
+			// 已登录
+			c.LoadView(w,tplname...)
+			Logger().LogDebug("JP ", "已登录")
+			return true
+		}
+	}
+}
+
+
+
 // json 输出函数
 func (c *Controller)ResponseToJson(w *Response)  {
 	if c.JsonData.Datas == nil{

@@ -52,6 +52,8 @@ type config struct {
 
 	OracleDriverName string
 	OracleConnUrl    string
+
+	Cycle int
 }
 
 func (conf *config) LoadConfig(fname string) (bool, error) {
@@ -172,6 +174,8 @@ func Config() *config {
 
 			OracleDriverName: "oci8",
 			OracleConnUrl:    "sys/123456@127.0.0.1:1521/ORCL",
+
+			Cycle: 5,
 		}
 	}
 
