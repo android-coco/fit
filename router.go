@@ -287,7 +287,6 @@ func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		defer r.recv(w, req)
 	}
 	path := req.URL.Path
-	Logger().LogInfo("Router:", path, req.Method)
 	if root := r.trees[req.Method]; root != nil {
 		//静态文件加载
 		if strings.HasPrefix(path, "/static/") {
@@ -295,6 +294,7 @@ func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			had.ServeHTTP(w, req)
 			return
 		}
+		Logger().LogInfo("Router:", path, req.Method)
 		if handleFunc, ps, tsr := root.getValue(path); handleFunc != nil {
 			response := newResponse(req, w)
 			defer response.flush()
