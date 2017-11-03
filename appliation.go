@@ -11,16 +11,16 @@ const (
 
 var (
 	g_App  *appication = nil
-	Modles []interface{}
+	//Modles []interface{}
 )
 
 type appication struct {
 	Server *http.Server
 }
 
-func (app *appication) InitModels(models []interface{}) {
-	Modles = models
-}
+//func (app *appication) InitModels(models []interface{}) {
+//	Modles = models
+//}
 
 func (app *appication) Init() (bool, error) {
 	//read from configuration file and initialize application
@@ -28,12 +28,13 @@ func (app *appication) Init() (bool, error) {
 	Log level: Verbose(5) Debug(4) Info(3) Warn(2) Error(1) Assert(0) Nonelog(-1)`)
 	logtag := flag.String("logtag", "", "Log print filter setting. The default is ''")
 	confFile := flag.String("confile", "config/fit.conf", "Configuration file.")
+	flag.Parse()
+
 	ok, err := Config().LoadConfig(*confFile)
 	if ok == false {
 		Logger().LogError(LOG_TAG, err.Error())
 	}
 
-	flag.Parse()
 
 	Logger().SetLogLevel(*loglevel)
 	Logger().SetLogTag(*logtag)
@@ -52,13 +53,7 @@ func (app *appication) Start() (bool, error) {
 		MaxHeaderBytes: Config().MaxHeaderBytes,
 	}
 	Logger().LogInfo(LOG_TAG, "start to listen on port "+Config().Port)
-	// 同步数据库
-	//if  err := Engine().Sync2(Modles...); err!=nil{
-	//	//fmt.Println("fail to sync database: ", err)
-	//	Logger().LogError("fail to sync database: ", err)
-	//} else {
-	//	Logger().LogInfo("success to sync database。。。")
-	//}
+
 	SartOK = true //启动OK
 	err := app.Server.ListenAndServe()
 

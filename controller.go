@@ -88,10 +88,18 @@ func (c *Controller) LoadView(w *Response, tplname ...string) {
 		arg = "view/" + arg
 		args = append(args, arg)
 	}
+
 	t, err = template.ParseFiles(args...)  //从文件创建一个模板
-	CheckError(err)
+
+    if err != nil {
+        Logger().LogError("Fatal error ", err.Error())
+    }
+
 	err = t.Execute(w.Writer(), c.Data)
-	CheckError(err)
+	
+    if err != nil {
+        Logger().LogError("Fatal error ", err.Error())
+    }
 }
 
 /*Checking session and then load a special view */
