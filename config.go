@@ -160,7 +160,7 @@ func Config() *config {
 
 			DriverName: "mysql",
 			HostName:   "127.0.0.1",
-			DBPort:     "3306",
+			DBPort:     "3307",
 			UserName:   "root",
 			Password:   "123456",
 			DataBase:   "test",

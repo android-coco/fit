@@ -138,3 +138,13 @@ func (c *Controller)ResponseToJson(w *Response)  {
 	}
 	fmt.Fprint(w.Writer(), string(b))
 }
+
+func (c *Controller) RenderingJson(result int, errMsg string, datas interface{}) {
+	c.JsonData.Datas = datas
+	c.JsonData.ErrorMsg = errMsg
+	c.JsonData.Result = result
+}
+
+func (c *Controller) RenderingJsonAutomatically(result int, errMsg string) {
+	c.RenderingJson(result, errMsg, make(map[string]interface{}, 0))
+}

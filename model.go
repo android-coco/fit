@@ -42,7 +42,7 @@ func MySqlEngine() *xorm.Engine  {
 }
 
 func initEngine() (*xorm.Engine, error) {
-	var dataSource string = Config().UserName + ":"  +
+	var dataSource  = Config().UserName + ":"  +
                     Config().Password + "@tcp(" + 
                     Config().HostName + ":" + 
                     Config().DBPort + ")/" + 
@@ -61,11 +61,11 @@ func initEngine() (*xorm.Engine, error) {
 func SQLServerEngine() *xorm.Engine {
 	if msEngine == nil {
 		var err error
-		var dataSourceName string = "server=" + Config().MSServer + 
+		var dataSourceName = "server=" + Config().MSServer +
             ";port=" + Config().MSDBPort + 
             ";database=" + Config().MSDataBase + 
             ";user id=" + Config().MSUserId + 
-            ";password=" + Config().MSPassword
+            ";password=" + Config().MSPassword + ";encrypt=disable"
 
 		msEngine, err = xorm.NewEngine(Config().MSDriverName, dataSourceName)
         CheckError(err)
