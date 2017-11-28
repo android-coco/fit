@@ -3,6 +3,7 @@ package fit
 import (
 	"flag"
 	"net/http"
+	"mime"
 )
 
 const (
@@ -10,7 +11,7 @@ const (
 )
 
 var (
-	g_App  *appication = nil
+	g_App *appication = nil
 	//Modles []interface{}
 )
 
@@ -35,16 +36,21 @@ func (app *appication) Init() (bool, error) {
 		Logger().LogError(LOG_TAG, err.Error())
 	}
 
-
 	Logger().SetLogLevel(*loglevel)
 	Logger().SetLogTag(*logtag)
 
 	return ok, err
 }
 
+func (app *appication) RegisterMime() error {
+	for k, v := range mimemaps {
+		mime.AddExtensionType(k, v)
+	}
+	return nil
+}
+
 //implement function at application level
 func (app *appication) Start() (bool, error) {
-
 	app.Server = &http.Server{
 		Handler:        Router(),
 		Addr:           Config().Port,
@@ -53,7 +59,8 @@ func (app *appication) Start() (bool, error) {
 		MaxHeaderBytes: Config().MaxHeaderBytes,
 	}
 	Logger().LogInfo(LOG_TAG, "start to listen on port "+Config().Port)
-
+	//registerMime()
+	//mime.AddExtensionType(".css", "text/css")
 	SartOK = true //启动OK
 	err := app.Server.ListenAndServe()
 

@@ -17,12 +17,37 @@ var (
 type JsonTime time.Time
 
 
-func (j JsonTime) MarshalJSON() ([]byte, error) {
-	return []byte(`"`+time.Time(j).Format("2006-01-02 15:04:05")+`"`), nil
+func (t JsonTime) MarshalJSON() ([]byte, error) {
+	return []byte(`"`+time.Time(t).Format("2006-01-02 15:04:05")+`"`), nil
 }
 
-func (j JsonTime) String() string {
-	return time.Time(j).Format("2006-01-02 15:04:05")
+func (t JsonTime) String() string {
+	return time.Time(t).Format("2006-01-02 15:04:05")
+}
+
+func (t JsonTime) NormParse() string {
+	return time.Time(t).Format("2006-01-02 15:04:05")
+}
+
+func (t JsonTime) NormParse2() string {
+	return time.Time(t).Format("2006-01-02 15:04")
+}
+
+
+func (t JsonTime) ParseDate() string {
+	return time.Time(t).Format("2006-01-02")
+}
+
+func (t JsonTime) ParseTime() string {
+	return time.Time(t).Format("15:04")
+}
+
+func (t JsonTime) IOParse() string {
+	return time.Time(t).Format("01-02 15:04")
+}
+
+func (t JsonTime) Before(t2 JsonTime) bool  {
+	return time.Time(t).Before(time.Time(t2))
 }
 
 func MySqlEngine() *xorm.Engine  {

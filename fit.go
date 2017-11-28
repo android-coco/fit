@@ -12,3 +12,7 @@ func Stop() bool {
 	App().Stop(true)
 	return true
 }
+
+func RegisterMime()  {
+	App().RegisterMime()
+}
