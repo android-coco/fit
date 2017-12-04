@@ -44,7 +44,10 @@ func (app *appication) Init() (bool, error) {
 
 func (app *appication) RegisterMime() error {
 	for k, v := range mimemaps {
-		mime.AddExtensionType(k, v)
+		err := mime.AddExtensionType(k, v)
+		if err != nil {
+			Logger().LogError("registerMime()", err)
+		}
 	}
 	return nil
 }
