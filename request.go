@@ -3,6 +3,8 @@ package fit
 import (
 	"net/http"
 	"strconv"
+	"time"
+	"errors"
 )
 
 type Request struct {
@@ -34,3 +36,14 @@ func (r *Request) FormInt64Value(key string) int64 {
 	return intval
 }
 
+func (r *Request) FormTimeStruct(key string) (datetime time.Time, err error) {
+	datetime, err = time.ParseInLocation("2006-01-02 15:04:05", r.FormValue("datetime"), time.Local)
+	if err != nil  {
+		return
+	}
+	if datetime.IsZero() {
+		err = errors.New("date is zero!")
+		return
+	}
+	return datetime, nil
+}

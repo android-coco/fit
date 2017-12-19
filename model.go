@@ -16,6 +16,7 @@ var (
 
 type JsonTime time.Time
 
+type FitTime time.Time
 
 func (t JsonTime) MarshalJSON() ([]byte, error) {
 	return []byte(`"`+time.Time(t).Format("2006-01-02 15:04:05")+`"`), nil
