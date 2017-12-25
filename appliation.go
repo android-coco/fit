@@ -46,7 +46,7 @@ func (app *appication) RegisterMime() error {
 	for k, v := range mimemaps {
 		err := mime.AddExtensionType(k, v)
 		if err != nil {
-			Logger().LogError("registerMime()", err)
+			Logger().LogError("registerMime()", err.Error())
 		}
 	}
 	return nil
