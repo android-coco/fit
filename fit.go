@@ -5,6 +5,7 @@ func Start() bool {
 	initConfig, _ := App().Init()
 	isStart, _ := App().Start()
 	start := isStart && initConfig
+	App().RegisterMime()
 	return start
 }
 
@@ -13,6 +14,3 @@ func Stop() bool {
 	return true
 }
 
-func RegisterMime()  {
-	App().RegisterMime()
-}
