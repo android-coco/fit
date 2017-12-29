@@ -193,7 +193,7 @@ func (c *Controller) FitSetStruct(bean interface{}, r *Request) (err error) {
 
 				//rv.Field(index).SetString(r.FormValue("datetime"))
 
-				fmt.Println("f.field:", rv.Field(index))
+				//fmt.Println("f.field:", rv.Field(index))
 			default:
 				err = errors.New("undeclared reflect type")
 				return
