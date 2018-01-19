@@ -86,6 +86,7 @@ func (tw *TimeWheel) Start() {
 				timeoutTasks := tw.fetchExpiredTasks(iterator)
 				tw.notifyExpiredTaskHandler(timeoutTasks)
 			default:
+				time.Sleep(500 * time.Millisecond)
 			}
 		}
 	}()
